@@ -19,7 +19,7 @@ I've implemented initial 'book processing' test code in PHP, currently given a u
 
 * identify start and end of book Gutenburg markers (their line numbers)
 
-* identify, isolate and array-load book contents and chapters
+* identify, isolate and array-load book contents block and chapters list
 
 
 # Credit where credits due
