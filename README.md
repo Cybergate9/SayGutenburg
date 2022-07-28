@@ -23,7 +23,7 @@ I've implemented initial 'book processing' test code in PHP, currently given a u
 
 * based on all this, the test processor cuts up the input and outputs each chapter as a separate text file
 
-Testing has *only* taken place the single Agatha Christie book in question (https://www.gutenberg.org/files/863/863-0.txt)
+Testing has *only* taken place on the single Agatha Christie book in the test code so far (https://www.gutenberg.org/files/863/863-0.txt)
 
 
 # Credit where credits due
@@ -32,7 +32,11 @@ Thanks to Charlie Harrington who triggered off [this idea on his blog](https://w
 
 # References
 
-[Apple docs on voice commands](https://developer.apple.com/library/archive/documentation/UserExperience/Conceptual/SpeechSynthesisProgrammingGuide/FineTuning/FineTuning.html#//apple_ref/doc/uid/TP40004365-CH5-SW11)
+* [Apple docs on voice commands](https://developer.apple.com/library/archive/documentation/UserExperience/Conceptual/SpeechSynthesisProgrammingGuide/FineTuning/FineTuning.html#//apple_ref/doc/uid/TP40004365-CH5-SW11)
+
+* [Project Gutenberg](https://www.gutenberg.org)
+
+* [Project Gutenberg Australia](https://www.gutenberg.net.au/)
 
 
 
