@@ -1,6 +1,6 @@
 # The idea
 
-Take take Project Gutenburg texts and turn them into 'audiobooks'
+Take Project Gutenburg texts and turn them into 'audiobooks'
 
 [Project Gutenberg](https://www.gutenberg.org) and [Project Gutenberg Australia](https://www.gutenberg.net.au/)
 
@@ -24,7 +24,7 @@ I've implemented initial 'book processing' test code in PHP, currently given a u
 
 # Credit where credits due
 
-Thanks to Charlie Harrington who triggered of [this idea on his blog](https://www.charlieharrington.com/flow-and-creative-computing/)
+Thanks to Charlie Harrington who triggered off [this idea on his blog](https://www.charlieharrington.com/flow-and-creative-computing/)
 
 # References
 
