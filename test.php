@@ -6,7 +6,8 @@
 ***/
 
 $bookurl = "https://www.gutenberg.org/files/863/863-0.txt"; // test is Agatha Christie's "The Mysterious Affair at Styles" 
-
+//$bookurl = "https://www.gutenberg.org/cache/epub/105/pg105.txt";
+$version = "1.01";
 
 // get book and character count
 $textinfull = file_get_contents($bookurl);
@@ -121,9 +122,26 @@ foreach($chapters as $cc=>$chap){
 		}
 	}
 }
+
+
+// so, if we get here and no content block or chapters found
+// we'll search through for basic chapter titles with text
+// and populated chapters array that way
+$cc=0;
+if(count($chapters) <= 0){ //no contents block
+	foreach($textinlines as $lc=>$line){
+		$x=0;
+		if(strstr($line, "Chapter")){
+			$chapters[$cc]['title']=$line;	
+			$chapters[$cc]['startline'][$x++]=$lc;
+			$chapters[$cc++]['no']=$cc;	
+		}
+	}
+}
+
+
 echo "\nChapters";
 print_r($chapters);
-
 
 // go through and dump contents of each chapter (based on start lines etc.) into a separate file
 foreach($chapters as $cc=>$chap){
@@ -132,23 +150,30 @@ foreach($chapters as $cc=>$chap){
 	$filename .= '-Chapter-'.$chap['no'].'.txt';
 	$x=0;
 	$ttext='';
+	$start=$chapters[$cc]['startline'][count($chapters[$cc]['startline'])-1]; //assume last occurrence is 'in text' chapter start
 	if(!isset($chapters[$cc+1])){
 		$end = $delims[1]-1;
 	} else {
-		$end = $chapters[$cc+1]['startline'][1]-1;
+		$end = $chapters[$cc+1]['startline'][count($chapters[$cc+1]['startline'])-1]-1;
 	}
-	//echo $cc.'s:'.$chap['startline'][1].'e:'.$end;
+	echo "\nChap:".$cc.' s:'.$start.' e:'.$end;
 	//echo "\n";
-	foreach(range($chap['startline'][1],$end) as $lc){
+	foreach(range($start,$end) as $lc){
 		$ttext .= $textinlines[$lc];
 	}
-	file_put_contents($filename,$ttext);
-	echo "\n".$filename." written..";
+	if(false){
+		file_put_contents($filename,$ttext);
+		echo "\n".$filename." written ..";
+	}else{
+		echo "\n".'test only, would create: '.$filename;
+	}
+	//file_put_contents($filename,$ttext);
+	//echo "\n".$filename." ..";
 }
 
 
-// dump entire processed lines representation into a 'debug file'
-file_put_contents($title."debug-coded.txt",tocodedtext($textinlines));
+// dump entire processed lines representation into a big 'debug file'
+file_put_contents(preg_replace("/ /",'',$title)."-debug-coded.txt",tocodedtext($textinlines));
 
 
 
