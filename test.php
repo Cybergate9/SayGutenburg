@@ -37,6 +37,7 @@ foreach($textinlines as $lc=>$line){
 	}
 
 }
+echo "\nDelimit lines";
 print_r($delims);
 
 
@@ -46,18 +47,31 @@ $semis=[]; $x=0;
 foreach($textinlines as $lc=>$line){
 	if(strstr($line, ":")){
 		$semis[$x]['line']=$lc;
-		$semis[$x++]['content']=$line;
+		$semis[$x]['content']=$line;
+		$split=explode(':',$line);
+		$semis[$x]['field']=$split[0];
+		$semis[$x++]['value']=$split[1];
 	}
 }
 $meta=[]; $x=0;
 foreach($semis as $semi){
 	if($semi['line'] < $delims[0]){
 		$metas[$x]['line']=$semi['line'];
-		$metas[$x++]['content']=$semi['content'];
+		$metas[$x]['content']=$semi['content'];
+		$metas[$x]['field']=trim($semi['field']);
+		$metas[$x++]['value']=trim($semi['value']);
 	}
 }
 // dump out book meta data
+echo "\nMetadata";
 print_r($metas);
+
+foreach($metas as $meta){ // get into globals what we need
+    if(strstr($meta['field'],'Title')){
+    	$title = trim($meta['value']);
+    }
+}
+
 
 
 // find and record the entirety of the 'Contents' block for book
@@ -81,7 +95,7 @@ foreach($textinlines as $lc=>$line){
 	}
 $previousline = $line;
 }
-//print_r($contents);
+
 
 // find and store into array chapter numbers and titles
 $tarray=[]; $chapters=[]; $x=0;
@@ -91,14 +105,50 @@ foreach($contents as $line){
 		$chapters[$x]['number']=$tarray[0];
 		$chapters[$x++]['title']=$tarray[1];
 	}
-
 }
 // dump chapters array to output
+//print_r($chapters);
+
+foreach($chapters as $cc=>$chap){
+	//echo "\n".$chap['number'];
+	$x=0;
+	foreach($textinlines as $lc=>$line){
+		if(strstr($line,$chap['number'].'.')){
+			//echo "\n";
+			//print($chap['number'].' at '.$lc.' {'.$line.'}'); 
+			$chapters[$cc]['startline'][$x++]=$lc;
+			$chapters[$cc]['no']=$cc+1;	
+		}
+	}
+}
+echo "\nChapters";
 print_r($chapters);
 
-// dump entire processed lines representation into a 'debug file'
-file_put_contents("debugoutput.txt",tocodedtext($textinlines));
 
+// go through and dump contents of each chapter (based on start lines etc.) into a separate file
+foreach($chapters as $cc=>$chap){
+	//echo "\n".$chap['number']."\n";
+	$filename = preg_replace("/ /",'',$title);
+	$filename .= '-Chapter-'.$chap['no'].'.txt';
+	$x=0;
+	$ttext='';
+	if(!isset($chapters[$cc+1])){
+		$end = $delims[1]-1;
+	} else {
+		$end = $chapters[$cc+1]['startline'][1]-1;
+	}
+	//echo $cc.'s:'.$chap['startline'][1].'e:'.$end;
+	//echo "\n";
+	foreach(range($chap['startline'][1],$end) as $lc){
+		$ttext .= $textinlines[$lc];
+	}
+	file_put_contents($filename,$ttext);
+	echo "\n".$filename." written..";
+}
+
+
+// dump entire processed lines representation into a 'debug file'
+file_put_contents($title."debug-coded.txt",tocodedtext($textinlines));
 
 
 
@@ -106,7 +156,6 @@ file_put_contents("debugoutput.txt",tocodedtext($textinlines));
 
 
 /***************/
-
 
 function conwrite($string, $value){
 	echo $string." ".$value."\n";

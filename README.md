@@ -21,6 +21,10 @@ I've implemented initial 'book processing' test code in PHP, currently given a u
 
 * identify, isolate and array-load book contents block and chapters list
 
+* based on all this, the test processor cuts up the input and outputs each chapter as a separate text file
+
+Testing has *only* taken place the single Agatha Christie book in question (https://www.gutenberg.org/files/863/863-0.txt)
+
 
 # Credit where credits due
 
