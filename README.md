@@ -1,6 +1,6 @@
 # The idea
 
-Take take Project Gutenburg texts and trun the into 'audiobooks'
+Take take Project Gutenburg texts and turn them into 'audiobooks'
 
 [Project Gutenberg](https://www.gutenberg.org) and [Project Gutenberg Australia](https://www.gutenberg.net.au/)
 
@@ -11,13 +11,15 @@ Take take Project Gutenburg texts and trun the into 'audiobooks'
 
 # Initial Test Code
 
-I've implemented initial 'book processing' test code in PHP, currently given a url i can:
+I've implemented initial 'book processing' test code in PHP, currently given a url it can:
 
 * character, line and word count
 
-* identify, isolate and array load book metadata
+* identify, isolate and array-load book metadata
 
-* identify, isolate and array load book contents and chapters
+* identify start and end of book Gutenburg markers (their line numbers)
+
+* identify, isolate and array-load book contents and chapters
 
 
 # Credit where credits due
