@@ -4,6 +4,13 @@ Take Project Gutenburg texts and turn them into 'audiobooks'
 
 [Project Gutenberg](https://www.gutenberg.org) and [Project Gutenberg Australia](https://www.gutenberg.net.au/)
 
+So two steps are required:
+
+* process books into their component parts (which will probably be quite a challenge because they're have a variety of layout logics)
+
+* once we have books in 'chapters' we can pass them to some sort of reading (Text-To-Speech, TTS) software
+
+
 # 'Say' on OSX
 
 ['Say'](https://ss64.com/osx/say.html) command line tool on OSX can speak relatively sanely, although work will be required to better implement 'pauses' at full stops and paragraph breaks. Should be doable using voice commands as referenced in Apple docs.
@@ -23,15 +30,18 @@ I've implemented initial 'book processing' test code in PHP, currently given a u
 
 * identify start and end of book Gutenburg markers (and their line numbers)
 
-* identify, isolate and array-load book 'contents block' and chapters list from within, into 'Chapters array'
+* identify, isolate and array-load book 'contents block' and chapters list from within, into 'Contents Block array'
 
-* if no 'contents block', identify 'Chapter X's within text and their meta, store in 'Chapters array'
+* (removed temporarily) if no 'contents block', identify 'Chapter X's within text and their meta, store in 'Chapters array'
 
-* for each Chapter look up its starting line number from within text and record into 'Chapters array'
+* for each Chapter find its starting line number 'markers' from within text and record them into 'Chapters array'
 
 * based on all this, the test processor cuts up the input and outputs each chapter as a separate text file
 
+
 Testing has *only* taken place on the single Agatha Christie book in the test code so far (https://www.gutenberg.org/files/863/863-0.txt)
+
+* with the Agatha Christie, under current logic, the Contents Block outputs as Chapter 1..
 
 
 # Credit where credits due

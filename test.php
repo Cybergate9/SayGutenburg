@@ -5,9 +5,27 @@
  * of an ebook (meta, book metadata, chapter list, etc)
 ***/
 
-$bookurl = "https://www.gutenberg.org/files/863/863-0.txt"; // test is Agatha Christie's "The Mysterious Affair at Styles" 
-//$bookurl = "https://www.gutenberg.org/cache/epub/105/pg105.txt";
 $version = "1.01";
+$opttesting=false;
+$optdump=false;
+
+echo "Project Gutenberg Book Processor, Test Version (".$version.")\n";
+if(count($argv)>1){
+	foreach(range(1,count($argv)-1) as $option){
+		if(($argv[$option]<=>'-t')==0){
+			echo "testing only\n";
+			$opttesting = true;
+		}
+		if(($argv[$option]<=>'-d')==0){
+			echo "dump file requested\n";
+			$optdump = true;
+		}
+	}
+}
+$bookurl = "https://www.gutenberg.org/files/863/863-0.txt"; // test is Agatha Christie's "The Mysterious Affair at Styles" 
+//$bookurl ="https://www.gutenberg.org/cache/epub/105/pg105.txt"; // Persuasion by Jane Austin
+//$bookurl = "https://www.gutenberg.org/cache/epub/68562/pg68562.txt"; //The peoples of Europe
+
 
 // get book and character count
 $textinfull = file_get_contents($bookurl);
@@ -63,24 +81,26 @@ foreach($semis as $semi){
 		$metas[$x++]['value']=trim($semi['value']);
 	}
 }
-// dump out book meta data
+/* dump out book meta data
 echo "\nMetadata";
-print_r($metas);
+print_r($metas);*/
 
 foreach($metas as $meta){ // get into globals what we need
     if(strstr($meta['field'],'Title')){
     	$title = trim($meta['value']);
     }
+    // echo rest
+    echo 'meta:field:['.$meta['field'].']:value:['.$meta['value']."]\n";
 }
 
 
 
 // find and record the entirety of the 'Contents' block for book
-$contents=[]; $x=0; $started=0; $newline=0;
+$contents=[]; $x=0; $started=0; $newline=0; $cc=0;
 foreach($textinlines as $lc=>$line){
-	if(strstr($line, "Contents")){
-		$contents[$x]['line']=$lc;
-		$contents[$x++]['content']=$line;
+	if(preg_match("/^CONTENTS/",strtoupper($line))){
+		//$contents[$x]['line']=$lc;
+		//$contents[$x++]['content']=$line;
 		$started = 1; $newline=0;
 	}
 	if($started ==1 and (strtohex($line) <=> '[13]')==0){
@@ -91,43 +111,107 @@ foreach($textinlines as $lc=>$line){
 		break;
 		if(strstr($line,"CHAPTER")){
 			$contents[$x]['line']=$lc;
-			$contents[$x++]['content']=$line;
+			$contents[$x]['content']=$line;
+			$newline=0;
 		}
+		if(((strtohex($line)<=>'[13]')!=0)){
+			if(preg_match("/^[CcIXVB0-9]/",$line)){ // this is a clude we allow for starts with (c)ontents (C)CONTENTS (I)ntroduction (B)ib Romans (XVI)
+				$tarray=explode('.',$line);
+				$contents[$x]['startswithnumber']=trim($tarray[0]);
+				$contents[$x]['content1st']=trim($line);
+				$contents[$x]['content']=trim($line);
+				$contents[$x]['line']=$lc;
+				$contents[$x]['chapter#']=$cc++;
+			}
+			else{
+				if(isset($contents[$x]['content'])){
+					$contents[$x]['content'] .= ' '.trim($line);
+				}
+				else
+				{
+					$contents[$x]['content1st']=trim($line);
+					$contents[$x]['line']=$lc;
+				}
+				if(!isset($contents[$x]['line'])){
+					$contents[$x]['line']=$lc;
+				}
+			}
+			$newline=0;
+		}
+
+		$x++;
 	}
 $previousline = $line;
 }
 
+// dump contents array to output
+/*echo "\nContents Block";
+print_r($contents);
+*/
+$endofcontentblock=$contents[count($contents)+1]['line']+1;
 
-// find and store into array chapter numbers and titles
+
+// find and further process contents into chapters numbers and titles
 $tarray=[]; $chapters=[]; $x=0;
 foreach($contents as $line){
-	if(!strstr($line['content'], 'Contents')){  //provided its not the header
-		$tarray = explode('.',$line['content']);
-		$chapters[$x]['number']=$tarray[0];
-		$chapters[$x++]['title']=$tarray[1];
-	}
+	//if(!preg_match("/^CONTENTS/",strtoupper($line['content1st']))){  //provided its not the header
+		$tarray = explode('.',$line['content1st']);
+		if(count($tarray)>1){
+			$chapters[$x]['number']=$tarray[0];
+			$chapters[$x]['titlefull']=trim($line['content']);
+			$chapters[$x]['title']=trim($tarray[1]);
+
+		} else {
+			$chapters[$x]['number']='unnumbered';
+			$chapters[$x]['title']=trim($tarray[0]);
+			$chapters[$x]['titlefull']=trim($line['content']);
+		}
+	//}
+	//copy across the rest
+	$chapters[$x]['line']=$line['line'];
+	$chapters[$x]['content']=$line['content'];
+	$chapters[$x]['content1st']=$line['content1st'];
+	$chapters[$x]['startswithnumber']=$line['startswithnumber'];
+	$chapters[$x]['chapter#']=$line['chapter#'];
+	$x++;
 }
-// dump chapters array to output
-//print_r($chapters);
+
+// zero out contents block
+$contents=[];
+/* dump chapters array to output
+echo "\nChapters I";
+print_r($chapters);
+*/
 
 foreach($chapters as $cc=>$chap){
 	//echo "\n".$chap['number'];
 	$x=0;
 	foreach($textinlines as $lc=>$line){
-		if(strstr($line,$chap['number'].'.')){
-			//echo "\n";
-			//print($chap['number'].' at '.$lc.' {'.$line.'}'); 
-			$chapters[$cc]['startline'][$x++]=$lc;
+		if(preg_match("/^[--9IVXivx_\.]*".$chap['title']."/",$line)){
+			$chapters[$cc]['startline'][$x++]=$lc;	
+			$chapters[$cc]['no']=$cc+1;
+		}
+		/*if(strstr($line,$chap['title'])){
+			$chapters[$cc]['startline'][$x++]=$lc;	
+			$chapters[$cc]['no']=$cc+1;	
+		} */
+		if(strstr(strtoupper($line),$chap['number'].'.')){
+			$chapters[$cc]['startline'][$x++]=$lc;	
 			$chapters[$cc]['no']=$cc+1;	
 		}
+
 	}
+	//$x++;	
 }
+
+/*echo "\nChapters II";
+print_r($chapters);*/
 
 
 // so, if we get here and no content block or chapters found
 // we'll search through for basic chapter titles with text
 // and populated chapters array that way
-$cc=0;
+/*$cc=0;
 if(count($chapters) <= 0){ //no contents block
 	foreach($textinlines as $lc=>$line){
 		$x=0;
@@ -137,46 +221,60 @@ if(count($chapters) <= 0){ //no contents block
 			$chapters[$cc++]['no']=$cc;	
 		}
 	}
-}
+}*/
 
-
-echo "\nChapters";
+echo "\nChapters III\n";
 print_r($chapters);
+echo "EOFCB:".$endofcontentblock."\n";
+
+//select the first start line thats greater >$endofcontentblock
 
 // go through and dump contents of each chapter (based on start lines etc.) into a separate file
+
 foreach($chapters as $cc=>$chap){
 	//echo "\n".$chap['number']."\n";
 	$filename = preg_replace("/ /",'',$title);
 	$filename .= '-Chapter-'.$chap['no'].'.txt';
 	$x=0;
 	$ttext='';
-	$start=$chapters[$cc]['startline'][count($chapters[$cc]['startline'])-1]; //assume last occurrence is 'in text' chapter start
+	$start=firstvaluegreaterthan($chapters[$cc]['startline'],$endofcontentblock); //assume last occurrence is 'in text' chapter start
 	if(!isset($chapters[$cc+1])){
 		$end = $delims[1]-1;
 	} else {
-		$end = $chapters[$cc+1]['startline'][count($chapters[$cc+1]['startline'])-1]-1;
+		$end = firstvaluegreaterthan($chapters[$cc+1]['startline'],$endofcontentblock)-1;
 	}
 	echo "\nChap:".$cc.' s:'.$start.' e:'.$end;
 	//echo "\n";
 	foreach(range($start,$end) as $lc){
 		$ttext .= $textinlines[$lc];
 	}
-	if(false){
+	if($opttesting){
+		echo "\n".'test only, would create: '.$filename;
+	}else{
 		file_put_contents($filename,$ttext);
 		echo "\n".$filename." written ..";
-	}else{
-		echo "\n".'test only, would create: '.$filename;
 	}
-	//file_put_contents($filename,$ttext);
-	//echo "\n".$filename." ..";
+	
 }
 
 
 // dump entire processed lines representation into a big 'debug file'
-file_put_contents(preg_replace("/ /",'',$title)."-debug-coded.txt",tocodedtext($textinlines));
+if($optdump){
+	$filename=preg_replace("/ /",'',$title)."-debug-coded.txt";
+	echo "\ndebug output dumped into ".$filename."\n";
+	file_put_contents($filename,tocodedtext($textinlines));
+}
 
 
-
+function firstvaluegreaterthan($inarray, $testvalue){
+	//print_r($inarray);
+	foreach($inarray as $value){
+		if($value > $testvalue)
+			return $value;
+		$max = $value;
+	}
+	return $max;
+}
 
 
 
