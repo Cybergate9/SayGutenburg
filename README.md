@@ -6,21 +6,32 @@ Take Project Gutenburg texts and turn them into 'audiobooks'
 
 So two steps are required:
 
-* process books into their component parts (which will probably be quite a challenge because they're have a variety of layout logics)
+1. process books into their component parts (which will probably be quite a challenge because they're in a variety of layout logics)
 
-* once we have books in 'chapters' we can pass them to some sort of reading (Text-To-Speech, TTS) software
+2. * once we have books in 'chapters' we can pass them to some sort of reading (Text-To-Speech, TTS) software
 
+We are currently at step 1.
 
 # 'Say' on OSX
 
-['Say'](https://ss64.com/osx/say.html) command line tool on OSX can speak relatively sanely, although work will be required to better implement 'pauses' at full stops and paragraph breaks. Should be doable using voice commands as referenced in Apple docs.
+['Say'](https://ss64.com/osx/say.html) command line tool on OSX can speak relatively sanely, although work will be required to better implement 'pauses' at full stops and paragraph breaks. Should be doable using voice commands as referenced in Apple docs. But it's good enough in test already to say if step one can be solved, then step two is just a choice of tools.
 
 # TTS by Mozilla
 
 Will probably need to [look into this](https://github.com/mozilla/TTS), Mozzila Text-to-Speech (TTS), even if we only used already created models.
 
+# Progress (6Aug2022, test3.php)
 
-# Initial Test Code
+Is more sane, predictable, and therefore robust. Tests fairly reliably on two 'types', over three books.
+
+A frustrating case is [this book](https://www.gutenberg.org/cache/epub/68562/pg68562.txt) which while a human can work out what's going on it's a large pain in the backside to line process because it does odd things like use _ to lead and trail chapter titles, breaks chapter titles over lines in both content block and within text etc. I'm guessing this one may fall into the bucket of hand edit first then process.
+
+That raises the question of sensing and providing some warning/guidance from the processor when layouts are not understood - an interesting future to do maybe.
+
+
+
+
+# Initial Test Code (27Jul2022, test.php)
 
 I've implemented initial 'book processing' test code in PHP, currently given a url it can:
 
