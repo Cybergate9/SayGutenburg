@@ -2,7 +2,7 @@
 
 # The idea
 
-Take Project Gutenburg texts and turn them into 'audiobooks'
+Take Project Gutenberg texts and turn them into 'audiobooks'
 
 [Project Gutenberg](https://www.gutenberg.org) and [Project Gutenberg Australia](https://www.gutenberg.net.au/)
 
@@ -14,16 +14,35 @@ So two steps are required:
 
 We are currently at step 1.
 
+# Basics
+
+Initially we're trying to extract chapters as separate text files from a single file utf-8 text version of a Project Gutenberg book.
+
+If you're familiar with the variety of layouts in these text files then you'll realise it's not rocket science, but it's not trivial either.
+
+Approach so far, sort psuedo-coded goes something like:
+
+*	identify and get - metadata, contents block if any, start and end of book marker line numbers
+
+* 	process content block in a little 'chapters' dataset, and then try and identify where each chapter starts
+
+* 	if there's no content block try to create 'chapters' dataset by looking up 'Chapter XX' type titles within text
+
+* 	once we have what we think is a sane 'chapters' dataset use it to run through (based on line numbers we've identified) and extract each chapter into its own, nicely named (e.g. booktitledDIR/XX-booktitle-chapterYY.txt), text file 
+
+Sounds simple enough, however, not quite so :-) 
 
 # Usage:
 
 php testx.php [-t] [-t1] [-t3] [-p] [-d] [-D]
 
+If successful will create a 'booktitle' directory, and place each extracted booktitle-chapter.txt file in there. 
+
 where:
 
 * -t test only (don't output chapter files), default off
 
-* -t1 run code verbose to test1 point 1 and exit, default off
+* -t1 run code verbose to test point 1 and exit, default off
 
 * -t2 run code verbose to test point 2 and exit, default off
 
@@ -113,7 +132,7 @@ Thanks to Charlie Harrington who triggered off [this idea on his blog](https://w
 
 # Prior Art
 
-Other attempts to extract chapters from GUtenberg Books
+Other attempts to extract chapters, or parts, from Project Gutenberg Books
 
 * [chapterize](https://github.com/JonathanReeve/chapterize)
 
