@@ -1,13 +1,4 @@
-Hacker New thread - https://news.ycombinator.com/item?id=32380045
 
-https://github.com/coqui-ai/TTS
-
-there are other attempts at this:
-
-e.g.
-
-[chapterize](https://github.com/JonathanReeve/chapterize)
-[text splitter](https://github.com/jdmartin/gutenberg-text-splitter)
 
 # The idea
 
