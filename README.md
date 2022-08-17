@@ -12,7 +12,7 @@ So two steps are required:
 
 2. once we have books in 'chapters' we can pass them to some sort of reading (Text-To-Speech, TTS) software
 
-We are currently at step 1.
+We are currently at step 1. Work in progress.
 
 # Basics
 
@@ -20,13 +20,13 @@ Initially we're trying to extract chapters as separate text files from a single 
 
 If you're familiar with the variety of layouts in these text files then you'll realise it's not rocket science, but it's not trivial either.
 
-Approach so far, sort psuedo-coded goes something like:
+Approach so far, sort of psuedo-coded goes something like:
 
 *	identify and get - metadata, contents block if any, start and end of book marker line numbers
 
-* 	process content block in a little 'chapters' dataset, and then try and identify where each chapter starts
+* 	process contents block into a little 'chapters' dataset, and then try and identify where each chapter starts in body text
 
-* 	if there's no content block try to create 'chapters' dataset by looking up 'Chapter XX' type titles within text
+* 	if there's no contents block try to create 'chapters' dataset by looking up 'Chapter XX' type titles within body text
 
 * 	once we have what we think is a sane 'chapters' dataset use it to run through (based on line numbers we've identified) and extract each chapter into its own, nicely named (e.g. booktitledDIR/XX-booktitle-chapterYY.txt), text file 
 
@@ -46,7 +46,7 @@ where:
 
 * -t2 run code verbose to test point 2 and exit, default off
 
-* -p invode preprocessor (over entire text), default off
+* -p invoke preprocessor (over entire text), default off
 
 * -d create dump file (as dir/bookname-debug-coded.txt), default off
 
@@ -57,7 +57,7 @@ where:
 
 More refined, all output goes into 'book title' subdir, more error checking and exit points, dealing with roman numerals
 
-Testing on:
+Testing, with pretty good success, on:
 
 * Agatha Christie's "The Mysterious Affair at Styles" 
 
@@ -104,14 +104,17 @@ Testing has *only* taken place on the single Agatha Christie book in the test co
 * with the Agatha Christie, under current logic, the Contents Block outputs as Chapter 1..
 
 
+
 # Credit where credits due
 
 Thanks to Charlie Harrington who triggered off [this idea on his blog](https://www.charlieharrington.com/flow-and-creative-computing/)
 
 
+
 # 'Say' on OSX
 
 ['Say'](https://ss64.com/osx/say.html) command line tool on OSX can speak relatively sanely, although work will be required to better implement 'pauses' at full stops and paragraph breaks. Should be doable using voice commands as referenced in Apple docs. But it's good enough in test already to say if step one can be solved, then step two is just a choice of tools.
+
 
 
 # References
@@ -129,6 +132,8 @@ Thanks to Charlie Harrington who triggered off [this idea on his blog](https://w
 * [Coqui TTS](https://github.com/coqui-ai/TTS)
 
 * [Hacker News thread on TTS's](https://news.ycombinator.com/item?id=32380045)
+
+
 
 # Prior Art
 
